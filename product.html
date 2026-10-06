@@ -1,8 +1,23 @@
 <!DOCTYPE html>
 <html lang="en"><head>
+
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-WD82LCK3');</script>
+<!-- End Google Tag Manager -->
+
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Laptop | Laptopia</title><link rel="stylesheet" href="css/style.css">
 </head><body>
+
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WD82LCK3"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
 <div id="header"></div>
 <section><div class="container">
   <div class="crumbs" id="crumbs"></div>
@@ -14,6 +29,7 @@
 </div></section>
 <div id="footer"></div>
 <script src="js/products.js"></script>
+<script src="js/cart.js"></script>
 <script>
 renderLayout("product");
 const id = +new URLSearchParams(location.search).get("id") || 1;
@@ -28,16 +44,17 @@ document.getElementById("product").innerHTML = `
     <div class="price">${money(p.price)}</div>
     <p class="desc">${p.desc}</p>
     <table class="specs">${Object.entries(p.specs).map(([k,v])=>`<tr><td>${k}</td><td>${v}</td></tr>`).join("")}</table>
-    <div class="qty-row"><label for="qty">Quantity</label>
-      <select id="qty">${[1,2,3,4,5].map(n=>`<option>${n}</option>`).join("")}</select></div>
-    <button class="btn" onclick="addToCart(${p.id})">Add to Cart</button>
+    <p style="margin:20px 0 12px"><label>Quantity <select id="qty" style="padding:8px;margin-left:8px">
+      ${[1,2,3,4,5].map(n=>`<option>${n}</option>`).join("")}</select></label></p>
+    <button class="btn" id="addBtn" style="border:0;cursor:pointer;font:inherit;font-weight:700">Add to Cart</button>
   </div>`;
 document.getElementById("related").innerHTML = PRODUCTS.filter(x=>x.id!==p.id).slice(0,4).map(cardHTML).join("");
 
-function addToCart(id){
-  const qty = +document.getElementById("qty").value;
-  localStorage.setItem("cart_item", JSON.stringify({id, qty}));
-  location.href = "checkout.html";
-}
+document.getElementById("addBtn").addEventListener("click", function(){
+  Cart.add(p.id, document.getElementById("qty").value);
+});
+
+// GA4: view_item
+LP.push("view_item", { currency: "USD", value: p.price, items: [LP.gaItem(p, 1)] });
 </script>
 </body></html>
