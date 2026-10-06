@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laptop | Laptopia</title><link rel="stylesheet" href="css/style.css">
+</head><body>
+<div id="header"></div>
+<section><div class="container">
+  <div class="crumbs" id="crumbs"></div>
+  <div class="product" id="product"></div>
+</div></section>
+<section class="alt"><div class="container">
+  <h2 class="title">You may also like</h2><p class="sub">&nbsp;</p>
+  <div class="grid" id="related"></div>
+</div></section>
+<div id="footer"></div>
+<script src="js/products.js"></script>
+<script>
+renderLayout("product");
+const id = +new URLSearchParams(location.search).get("id") || 1;
+const p = PRODUCTS.find(x=>x.id===id) || PRODUCTS[0];
+document.title = p.name + " | Laptopia";
+document.getElementById("crumbs").innerHTML = `<a href="index.html">Home</a> / <a href="products.html">Laptops</a> / ${p.name}`;
+document.getElementById("product").innerHTML = `
+  <img class="main-img" src="${p.image}" alt="${p.name}" onerror="this.onerror=null;this.src=FALLBACK">
+  <div>
+    <small style="color:#6b6b6b;text-transform:uppercase;letter-spacing:1px">${p.category}</small>
+    <h1>${p.name}</h1>
+    <div class="price">${money(p.price)}</div>
+    <p class="desc">${p.desc}</p>
+    <table class="specs">${Object.entries(p.specs).map(([k,v])=>`<tr><td>${k}</td><td>${v}</td></tr>`).join("")}</table>
+    <div class="qty-row"><label for="qty">Quantity</label>
+      <select id="qty">${[1,2,3,4,5].map(n=>`<option>${n}</option>`).join("")}</select></div>
+    <button class="btn" onclick="addToCart(${p.id})">Add to Cart</button>
+  </div>`;
+document.getElementById("related").innerHTML = PRODUCTS.filter(x=>x.id!==p.id).slice(0,4).map(cardHTML).join("");
+
+function addToCart(id){
+  const qty = +document.getElementById("qty").value;
+  localStorage.setItem("cart_item", JSON.stringify({id, qty}));
+  location.href = "checkout.html";
+}
+</script>
+</body></html>

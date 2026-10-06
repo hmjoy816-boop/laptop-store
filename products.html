@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>All Laptops | Laptopia</title><link rel="stylesheet" href="css/style.css">
+</head><body>
+<div id="header"></div>
+<div class="page-head"><div class="container"><h1>All Laptops</h1><p>Browse our full collection.</p></div></div>
+<section><div class="container">
+  <div class="filters" id="filters"></div>
+  <div class="grid" id="list"></div>
+</div></section>
+<div id="footer"></div>
+<script src="js/products.js"></script>
+<script>
+renderLayout("products");
+let current = new URLSearchParams(location.search).get("cat") || "All";
+function draw(){
+  document.getElementById("filters").innerHTML = ["All",...CATEGORIES].map(c=>`<button class="${c===current?"on":""}" onclick="current='${c}';draw()">${c}</button>`).join("");
+  const items = current==="All" ? PRODUCTS : PRODUCTS.filter(p=>p.category===current);
+  document.getElementById("list").innerHTML = items.map(cardHTML).join("");
+}
+draw();
+</script>
+</body></html>

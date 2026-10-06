@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Order Confirmed | Laptopia</title><link rel="stylesheet" href="css/style.css">
+</head><body>
+<div id="header"></div>
+<section><div class="container" id="wrap"></div></section>
+<div id="footer"></div>
+
+<script src="js/products.js"></script>
+<script>
+renderLayout("");
+const o = JSON.parse(localStorage.getItem("last_order") || "null");
+const wrap = document.getElementById("wrap");
+if(!o){
+  wrap.innerHTML = `<p class="sub">No recent order found.</p><a class="btn" href="products.html">Browse Laptops</a>`;
+}else{
+  wrap.innerHTML = `<div class="confirm">
+    <div class="tick">&#10003;</div>
+    <h1>Order Confirmed!</h1>
+    <p class="sub">Thank you, ${o.customer.name}. A confirmation will be sent to ${o.customer.email}.</p>
+    <div class="box">
+      <p><b>Order number:</b> ${o.number}</p>
+      <p><b>Item:</b> ${o.product} &times; ${o.qty}</p>
+      <p><b>Total:</b> ${money(o.total)} (${o.customer.payment})</p>
+      <p><b>Deliver to:</b> ${o.customer.address}, ${o.customer.city}, ${o.customer.country}</p>
+    </div>
+    <a class="btn" href="index.html">Continue Shopping</a>
+  </div>`;
+}
+</script>
+</body></html>

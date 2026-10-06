@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Checkout | Laptopia</title><link rel="stylesheet" href="css/style.css">
+</head><body>
+<div id="header"></div>
+<div class="page-head"><div class="container"><h1>Checkout</h1><p>Enter your details to place the order.</p></div></div>
+
+<section><div class="container" id="wrap"></div></section>
+<div id="footer"></div>
+
+<script src="js/products.js"></script>
+<script>
+renderLayout("");
+const item = JSON.parse(localStorage.getItem("cart_item") || "null");
+const wrap = document.getElementById("wrap");
+
+if(!item){
+  wrap.innerHTML = `<p class="sub">Your cart is empty.</p><a class="btn" href="products.html">Browse Laptops</a>`;
+}else{
+  const p = PRODUCTS.find(x=>x.id===item.id);
+  const shipping = p.price*item.qty >= 500 ? 0 : 25;
+  const total = p.price*item.qty + shipping;
+
+  wrap.innerHTML = `<div class="checkout">
+    <form id="orderForm">
+      <h2>Delivery Details</h2>
+      <div class="field"><label>Full Name</label><input name="name" required></div>
+      <div class="row2">
+        <div class="field"><label>Email</label><input type="email" name="email" required></div>
+        <div class="field"><label>Phone</label><input type="tel" name="phone" required></div>
+      </div>
+      <div class="field"><label>Address</label><input name="address" required></div>
+      <div class="row2">
+        <div class="field"><label>City</label><input name="city" required></div>
+        <div class="field"><label>Country</label><input name="country" required></div>
+      </div>
+      <div class="field"><label>Payment Method</label>
+        <select name="payment"><option>Cash on Delivery</option><option>Bank Transfer</option></select></div>
+      <div class="field"><label>Order Note (optional)</label><textarea name="note" rows="3"></textarea></div>
+      <button class="btn" type="submit">Confirm Order</button>
+    </form>
+
+    <aside class="summary">
+      <h2>Order Summary</h2>
+      <img src="${p.image}" alt="${p.name}" onerror="this.onerror=null;this.src=FALLBACK">
+      <div class="line"><span>${p.name} &times; ${item.qty}</span><span>${money(p.price*item.qty)}</span></div>
+      <div class="line"><span>Shipping</span><span>${shipping ? money(shipping) : "Free"}</span></div>
+      <div class="line total"><span>Total</span><span>${money(total)}</span></div>
+    </aside>
+  </div>`;
+
+  document.getElementById("orderForm").addEventListener("submit", e=>{
+    e.preventDefault();
+    const f = Object.fromEntries(new FormData(e.target).entries());
+    const order = {
+      number: "LP-" + Date.now().toString().slice(-8),
+      product: p.name, qty: item.qty, total, customer: f
+    };
+    localStorage.setItem("last_order", JSON.stringify(order));
+    localStorage.removeItem("cart_item");
+    location.href = "confirmation.html";
+  });
+}
+</script>
+</body></html>
