@@ -1,66 +1,104 @@
 <!DOCTYPE html>
 <html lang="en"><head>
+
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-WD82LCK3');</script>
+<!-- End Google Tag Manager -->
+
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Checkout | Laptopia</title><link rel="stylesheet" href="css/style.css">
+<style>
+.co{display:grid;grid-template-columns:1.2fr 1fr;gap:48px;align-items:start}
+.co label{display:block;font-size:14px;font-weight:600;margin:16px 0 6px}
+.co input,.co select,.co textarea{width:100%;padding:12px;border:1px solid #ccc;font:inherit;box-sizing:border-box}
+.co .row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.sum{background:#f3f3f3;border:1px solid #0a0a0a;padding:24px}
+.sum .ln{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid #ddd}
+.sum .tot{font-weight:800;font-size:20px;border:0}
+.sum button.rm{background:none;border:0;color:#b00;cursor:pointer;font:inherit;font-size:13px;padding:0}
+.sum img{width:100%;height:auto;display:block;margin-bottom:12px}
+@media(max-width:800px){.co{grid-template-columns:1fr}}
+</style>
 </head><body>
+
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WD82LCK3"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
 <div id="header"></div>
 <div class="page-head"><div class="container"><h1>Checkout</h1><p>Enter your details to place the order.</p></div></div>
-
-<section><div class="container" id="wrap"></div></section>
-<div id="footer"></div>
-
-<script src="js/products.js"></script>
-<script>
-renderLayout("");
-const item = JSON.parse(localStorage.getItem("cart_item") || "null");
-const wrap = document.getElementById("wrap");
-
-if(!item){
-  wrap.innerHTML = `<p class="sub">Your cart is empty.</p><a class="btn" href="products.html">Browse Laptops</a>`;
-}else{
-  const p = PRODUCTS.find(x=>x.id===item.id);
-  const shipping = p.price*item.qty >= 500 ? 0 : 25;
-  const total = p.price*item.qty + shipping;
-
-  wrap.innerHTML = `<div class="checkout">
-    <form id="orderForm">
+<section><div class="container">
+  <div id="empty" style="display:none"><h2>Your cart is empty</h2><p><a class="btn" href="products.html">Browse Laptops</a></p></div>
+  <div class="co" id="co">
+    <form id="form" novalidate>
       <h2>Delivery Details</h2>
-      <div class="field"><label>Full Name</label><input name="name" required></div>
-      <div class="row2">
-        <div class="field"><label>Email</label><input type="email" name="email" required></div>
-        <div class="field"><label>Phone</label><input type="tel" name="phone" required></div>
-      </div>
-      <div class="field"><label>Address</label><input name="address" required></div>
-      <div class="row2">
-        <div class="field"><label>City</label><input name="city" required></div>
-        <div class="field"><label>Country</label><input name="country" required></div>
-      </div>
-      <div class="field"><label>Payment Method</label>
-        <select name="payment"><option>Cash on Delivery</option><option>Bank Transfer</option></select></div>
-      <div class="field"><label>Order Note (optional)</label><textarea name="note" rows="3"></textarea></div>
-      <button class="btn" type="submit">Confirm Order</button>
+      <label>Full Name</label><input name="name" required>
+      <div class="row"><div><label>Email</label><input name="email" type="email" required></div>
+      <div><label>Phone</label><input name="phone" required></div></div>
+      <label>Address</label><input name="address" required>
+      <div class="row"><div><label>City</label><input name="city" required></div>
+      <div><label>Country</label><input name="country" required></div></div>
+      <label>Payment Method</label>
+      <select name="payment"><option>Cash on Delivery</option><option>Bank Transfer</option><option>Credit Card</option></select>
+      <label>Order Note (optional)</label><textarea name="note" rows="3"></textarea>
+      <p><button class="btn" type="submit" style="border:0;cursor:pointer;font:inherit;font-weight:700;margin-top:20px">Place Order</button></p>
     </form>
-
-    <aside class="summary">
-      <h2>Order Summary</h2>
-      <img src="${p.image}" alt="${p.name}" onerror="this.onerror=null;this.src=FALLBACK">
-      <div class="line"><span>${p.name} &times; ${item.qty}</span><span>${money(p.price*item.qty)}</span></div>
-      <div class="line"><span>Shipping</span><span>${shipping ? money(shipping) : "Free"}</span></div>
-      <div class="line total"><span>Total</span><span>${money(total)}</span></div>
-    </aside>
-  </div>`;
-
-  document.getElementById("orderForm").addEventListener("submit", e=>{
-    e.preventDefault();
-    const f = Object.fromEntries(new FormData(e.target).entries());
-    const order = {
-      number: "LP-" + Date.now().toString().slice(-8),
-      product: p.name, qty: item.qty, total, customer: f
-    };
-    localStorage.setItem("last_order", JSON.stringify(order));
-    localStorage.removeItem("cart_item");
-    location.href = "confirmation.html";
-  });
+    <div class="sum" id="sum"></div>
+  </div>
+</div></section>
+<div id="footer"></div>
+<script src="js/products.js"></script>
+<script src="js/cart.js"></script>
+<script>
+renderLayout("checkout");
+function draw(){
+  const lines = Cart.lines();
+  document.getElementById("co").style.display = lines.length ? "" : "none";
+  document.getElementById("empty").style.display = lines.length ? "none" : "";
+  document.getElementById("sum").innerHTML = "<h2>Order Summary</h2>" +
+    lines.map(l=>`<div><img src="${l.p.image}" alt="" onerror="this.onerror=null;this.src=FALLBACK"></div>
+      <div class="ln"><span>${LP.esc(l.p.name)} × ${l.qty}<br><button class="rm" data-id="${l.p.id}">Remove</button></span><span>${LP.fmt(l.p.price*l.qty)}</span></div>`).join("") +
+    `<div class="ln"><span>Shipping</span><span>Free</span></div>
+     <div class="ln tot"><span>Total</span><span>${LP.fmt(Cart.total())}</span></div>`;
 }
+draw();
+
+// GA4: begin_checkout (once, only if cart has items)
+(function(){
+  const lines = Cart.lines();
+  if (lines.length) LP.push("begin_checkout", { currency:"USD", value:Cart.total(), items:lines.map(l=>LP.gaItem(l.p,l.qty)) });
+})();
+
+document.getElementById("sum").addEventListener("click", function(e){
+  const id = e.target.getAttribute && e.target.getAttribute("data-id");
+  if (id) { Cart.remove(+id); draw(); }
+});
+
+document.getElementById("form").addEventListener("submit", function(e){
+  e.preventDefault();
+  const f = e.target;
+  if (!f.checkValidity()) { f.reportValidity(); return; }
+  const lines = Cart.lines();
+  if (!lines.length) return;
+  const d = Object.fromEntries(new FormData(f).entries());
+
+  // GA4: add_payment_info (no personal data sent)
+  LP.push("add_payment_info", { currency:"USD", value:Cart.total(), payment_type:d.payment, items:lines.map(l=>LP.gaItem(l.p,l.qty)) });
+
+  const order = {
+    id: "LP-" + Math.floor(10000000 + Math.random()*90000000),
+    items: lines.map(l=>LP.gaItem(l.p,l.qty)),
+    total: Cart.total(), name: d.name, email: d.email,
+    address: d.address, city: d.city, country: d.country, payment: d.payment, tracked: false
+  };
+  LP.write(LP.OKEY, order);
+  Cart.clear();
+  setTimeout(function(){ location.href = "confirmation.html"; }, 300);
+});
 </script>
 </body></html>
